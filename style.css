@@ -1,0 +1,30 @@
+body {
+  color: white;
+  font-family: Sans-Serif;
+  margin: 0;
+  background: linear-gradient(22deg, black, black, #000113, #000933, #00090D, black, black);
+  height: 100vh;
+  background-attachment: fixed;
+}
+#msg-box {
+  font-weight: bold;
+  background: #005D92;
+  padding: 0.5em;
+  color: #33F400;
+  border-radius: 8px;
+  border: 2px #33F400 solid;
+}
+#paddinger {
+  padding: 0.5em;
+  padding-bottom: 0;
+}
+[contenteditable], select {
+  outline: 0;
+}
+canvas {
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+}
+body {
+  user-select: none;
+}
