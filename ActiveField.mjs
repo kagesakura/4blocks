@@ -204,19 +204,20 @@ export class ActiveField extends SafeObject {
     if (typeof this.#currentMinoKind !== "number") return;
     let dummyY = this.#currentMinoY;
     dummyY += 1;
+    let hasFallen = false;
     if (!this.#isTouchedDown()) {
+      hasFallen = true;
       this.#currentMinoY += 1;
       this.#lockdown.extendLockdownTimer();
       if (this.#currentMinoY < this.#currentMinoLowestY) {
         this.#currentMinoLowestY = this.#currentMinoY;
         this.#lockdown.resetMinoMovementRemaining();
       }
-      if (this.#isTouchedDown()) {
-        this.#lockdown.startLockdownTimer();
-      }
-      return true;
     }
-    return false;
+    if (this.#isTouchedDown()) {
+      this.#lockdown.startLockdownTimer();
+    }
+    return hasFallen;
   }
   hardDropMino() {
     if (typeof this.#currentMinoKind !== "number") return;
