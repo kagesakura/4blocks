@@ -54,7 +54,7 @@ window.addEventListener("load", async () => {
     diaplay: "inline-box",
     userSelect: "none",
     borderRadius: "15px",
-    border: "#D7D7D7 5px solid",    
+    border: "#D7D7D7 5px solid",
     background: "linear-gradient(#777,black)",
     fontFamily: "'Andale Mono','Courier New',Courier,monospace"
   });

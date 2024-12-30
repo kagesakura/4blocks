@@ -53,7 +53,7 @@ function draw(canvas, fieldCanvasData, field, scaler) {
 
   canvas.fillText(
     "HOLD", 4, 30,
-    "#FFFFFF", "start", "alphabetic", 
+    "#FFFFFF", "start", "alphabetic",
     `${22 * scale}px Sans-Serif`
   );
 
@@ -67,73 +67,99 @@ function draw(canvas, fieldCanvasData, field, scaler) {
 
   canvas.fillText(
     "SCORE", 3, 150, "#FFFFFF",
-    "start", "alphabetic", 
+    "start", "alphabetic",
     `${18 * scale}px Sans-Serif`
   );
   const scoreLen = `${field.score}`.length;
   const fontSize = scoreLen < 8 ? 17 : scoreLen < 9 ? 15 : scoreLen < 10 ? 13 : 12;
   canvas.fillText(
-    `${field.score}`,  
+    `${field.score}`,
     66.5, 160,
-    "#FFFFFF", "end", "top", 
+    "#FFFFFF", "end", "top",
     `${fontSize * scale}px Sans-Serif`
   );
 
   canvas.fillText(
     "LEVEL", 3, 205, "#FFFFFF",
-    "start", "alphabetic", 
+    "start", "alphabetic",
     `${18 * scale}px Sans-Serif`
   );
   const levelLen = `${field.level}`.length;
   const levelFontSize = levelLen < 8 ? 17 : levelLen < 9 ? 15 : levelLen < 10 ? 13 : 12;
   canvas.fillText(
-    `${field.level}`,  
+    `${field.level}`,
     66.5, 215,
-    "#FFFFFF", "end", "top", 
+    "#FFFFFF", "end", "top",
     `${levelFontSize * scale}px Sans-Serif`
   );
 
   canvas.fillText(
     "LINES", 3, 260, "#FFFFFF",
-    "start", "alphabetic", 
+    "start", "alphabetic",
     `${18 * scale}px Sans-Serif`
   );
   const linesLen = `${field.totalLinesCleared}`.length;
   const linesFontSize = linesLen < 8 ? 17 : linesLen < 9 ? 15 : linesLen < 10 ? 13 : 12;
   canvas.fillText(
-    `${field.totalLinesCleared}`,  
+    `${field.totalLinesCleared}`,
     66.5, 270,
-    "#FFFFFF", "end", "top", 
+    "#FFFFFF", "end", "top",
     `${linesFontSize * scale}px Sans-Serif`
   );
 
   canvas.fillText(
-    "TARGET", 3, 315, "#FFFFFF",
-    "start", "alphabetic", 
-    `${16 * scale}px Sans-Serif`
+    "REMAINS", 3, 315, "#FFFFFF",
+    "start", "alphabetic",
+    `${14 * scale}px Sans-Serif`
   );
   const targetLen = `${field.linesLeftToClear}`.length;
   const targetFontSize = targetLen < 8 ? 17 : targetLen < 9 ? 15 : targetLen < 10 ? 13 : 12;
   canvas.fillText(
-    `${field.linesLeftToClear}`,  
+    `${field.linesLeftToClear}`,
     66.5, 325,
-    "#FFFFFF", "end", "top", 
+    "#FFFFFF", "end", "top",
     `${targetFontSize * scale}px Sans-Serif`
   );
 
   canvas.fillText(
     "NEXT", 300, 30,
-    "#FFFFFF", "start", "alphabetic", 
+    "#FFFFFF", "start", "alphabetic",
     `${22 * scale}px Sans-Serif`
   );
   const nexts = field.getNexts();
   DrawUtil.drawNexts(
-    canvas, 
+    canvas,
     Util.checkChallengeMode() ? nexts.slice(0, 1) : nexts,
     315, 80,
     50, 16
   );
 }
+
+const audioContext = new AudioContext();
+/** @type {AudioBuffer} */
+let clickAudio;
+~async function() {
+  clickAudio = await audioContext.decodeAudioData(await (await fetch("./mm.wav")).arrayBuffer());
+}();
+/** @type {AudioBuffer} */
+let dropAudio;
+~async function() {
+  dropAudio = await audioContext.decodeAudioData(await (await fetch("./hh.wav")).arrayBuffer());
+}();
+const playClick = () => {
+  audioContext.resume();
+  const source = audioContext.createBufferSource();
+  source.buffer = clickAudio;
+  source.connect(audioContext.destination);
+  source.start();
+};
+const playDrop = () => {
+  audioContext.resume();
+  const source = audioContext.createBufferSource();
+  source.buffer = dropAudio;
+  source.connect(audioContext.destination);
+  source.start();
+};
 
 export class Game extends SafeObject {
   #canvas;
@@ -167,22 +193,22 @@ export class Game extends SafeObject {
     this.#field.holdMino();
   }
   hardDrop() {
-    this.#field.hardDropMino();
+    if (this.#field.hardDropMino()) playDrop();
   }
   softDrop() {
-    this.#field.softDropMino();
+    if (this.#field.softDropMino()) playClick();
   }
   moveRight() {
-    this.#field.moveMinoRight();
+    if (this.#field.moveMinoRight()) playClick();
   }
   moveLeft() {
-    this.#field.moveMinoLeft();
+    if (this.#field.moveMinoLeft()) playClick();
   }
   rotateRight() {
-    this.#field.rotateMinoRight();
+    if (this.#field.rotateMinoRight()) playClick();
   }
   rotateLeft() {
-    this.#field.rotateMinoLeft();
+    if (this.#field.rotateMinoLeft()) playClick();
   }
   fallMino() {
     this.#field.fallMino();
@@ -212,7 +238,7 @@ export class Game extends SafeObject {
   //   const width = Field.BLOCK_COLS * this.#fieldCanvasData.blockSize,
   //   height = (Field.BLOCK_ROWS - Field.BLOCK_Y_BIAS) * this.#fieldCanvasData.blockSize
   //   return Object.freeze({
-  //     x, y, width, height, left: x, top: y, 
+  //     x, y, width, height, left: x, top: y,
   //     right: x + width, bottom: y + height
   //   });
   // }

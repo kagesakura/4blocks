@@ -120,8 +120,7 @@ export class ActiveField extends SafeObject {
     )) {
       if (this.#linesLeftToClear <= 0) {
         this.#level++;
-        this.#linesLeftToClear = this.#level * 5; 
-        this.#fieldData.clear();
+        this.#linesLeftToClear = this.#level * 5;
       }
       setTimeout(() => {
         this.#currentMinoKind = nextMino;
@@ -220,29 +219,35 @@ export class ActiveField extends SafeObject {
     return hasFallen;
   }
   hardDropMino() {
-    if (typeof this.#currentMinoKind !== "number") return;
+    if (typeof this.#currentMinoKind !== "number") return false;
     const y = this.#getGhostMinoY();
     const distance = y - this.#currentMinoY;
     this.#currentMinoY = y;
     this.#score += distance * 2;
     this.#putMinoOnFieldAndShiftNexts();
+    return true;
   }
   softDropMino() {
-    if (typeof this.#currentMinoKind !== "number") return;
-    this.fallMino() && (this.#score++);
+    if (typeof this.#currentMinoKind !== "number") return false;
+    if (this.fallMino()) {
+      this.#score++;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /** @param {number} x */
   #moveMinoLR(x) {
-    if (typeof this.#currentMinoKind !== "number") return;
-    if (this.#lockdown.hasLocked() && this.#isTouchedDown()) return;
+    if (typeof this.#currentMinoKind !== "number") return false;
+    if (this.#lockdown.hasLocked() && this.#isTouchedDown()) return false;
     if (!Util.isPlacable(
       this.#currentMinoX + x,
       this.#currentMinoY,
       this.#currentMinoKind,
       this.#currentMinoRot,
       this.#fieldData
-    )) return;
+    )) return false;
 
     this.#currentMinoX += x;
 
@@ -250,19 +255,20 @@ export class ActiveField extends SafeObject {
     if (this.#isTouchedDown()) {
       this.#lockdown.startLockdownTimer();
     }
+    return true;
   }
   moveMinoRight() {
-    this.#moveMinoLR(1);
+    return this.#moveMinoLR(1);
   }
   moveMinoLeft() {
-    this.#moveMinoLR(-1);
+    return this.#moveMinoLR(-1);
   }
 
   /** @param {number} angle */
   #rotateMino(angle) {
     const currentMinoKind = this.#currentMinoKind;
-    if (typeof currentMinoKind !== "number") return;
-    if (this.#lockdown.hasLocked() && this.#isTouchedDown()) return;
+    if (typeof currentMinoKind !== "number") return false;
+    if (this.#lockdown.hasLocked() && this.#isTouchedDown()) return false;
     const newRot = (this.#currentMinoRot + angle + 8) % 4;
     const candidacies = Util.checkChallengeMode() ? [[0, 0]] : Util.superRotationResolve(this.#currentMinoRot, newRot, currentMinoKind);
     const displacement = candidacies.find(({ 0: x, 1: y }) => Util.isPlacable(
@@ -272,7 +278,7 @@ export class ActiveField extends SafeObject {
       newRot,
       this.#fieldData
     ));
-    if (!displacement) return;
+    if (!displacement) return false;
     const { 0: displacementX, 1: displacementY } = displacement;
     this.#currentMinoRot = newRot;
     this.#currentMinoX += displacementX;
@@ -285,11 +291,12 @@ export class ActiveField extends SafeObject {
     if (this.#isTouchedDown()) {
       this.#lockdown.startLockdownTimer();
     }
+    return true;
   }
   rotateMinoRight() {
-    this.#rotateMino(1);
+    return this.#rotateMino(1);
   }
   rotateMinoLeft() {
-    this.#rotateMino(-1);
+    return this.#rotateMino(-1);
   }
 }

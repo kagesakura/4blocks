@@ -16,7 +16,7 @@ const isIntStr = /0/.exec.bind(re);
 const { isArray } = Array;
 const handler = Object.freeze({
   __proto__: null,
-  get(_, p, r) {
+  get(_, p) {
     if (typeof p !== "string") return void 0;
     if (isIntStr(p) && (+p < 0xFFFFFFFF)) return void 0;
     throw new TypeError(`The Property ${String(p)} doesn't exist.`);

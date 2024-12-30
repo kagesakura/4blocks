@@ -187,7 +187,7 @@ export const DrawUtil = frozenNullProto({
     nexts.forEach((minoShape, index) => {
       DrawUtil.drawMino(
         canvas, [5, 6].includes(minoShape) ? offsetX : offsetX + blockSize / 2, index * interval + offsetY,
-        minoShape, 0, blockSize, 
+        minoShape, 0, blockSize,
         Util.colorTable[minoShape]
       );
     });
